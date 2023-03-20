@@ -1,0 +1,28 @@
+name: "Rollout"
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "* * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  test: # make sure the action works on a clean machine without building
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: woehrl01/gitops-rollout-action@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
